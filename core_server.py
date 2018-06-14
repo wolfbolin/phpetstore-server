@@ -37,6 +37,14 @@ def get_animal(pid):
     return data
 
 
+@web.route('/api/get_user/<uid>')
+def get_user(uid):
+    data = PDBC.get_user(db, uid)
+    data = jsonify(data)
+    data.headers['Access-Control-Allow-Origin'] = '*'
+    return data
+
+
 @web.route('/api/login', methods=['POST'])
 def login():
     username = request.form.get('username').strip()
@@ -62,14 +70,26 @@ def pick():
     }
     uid = request.form.get('uid').strip()
     order = request.form.getlist('list[]')
-    print('uid'+uid)
     for item in order:
-        print(item)
-    if int(uid) <= 0 or len(order) < 1:
-        data['result'] = 'error'
-    else:
-        result = PDBC.pick_pet(db, uid, order)
-        data['result'] = result
+        if int(uid) <= 0 or len(order) < 1:
+            data['result'] = 'error'
+        else:
+            result = PDBC.pick_pet(db, uid, order)
+            data['result'] = result
+    data = jsonify(data)
+    data.headers['Access-Control-Allow-Origin'] = '*'
+    return data
+
+
+@web.route('/api/sure_user', methods=['POST'])
+def sure_user():
+    data = [request.form.get('user_name').strip(),
+            request.form.get('user_phone').strip(),
+            request.form.get('province').strip(),
+            request.form.get('area').strip(),
+            request.form.get('city').strip(),
+            request.form.get('user_address').strip()]
+    data = PDBC.sure_user(db, request.form.get('uid').strip(), data)
     data = jsonify(data)
     data.headers['Access-Control-Allow-Origin'] = '*'
     return data

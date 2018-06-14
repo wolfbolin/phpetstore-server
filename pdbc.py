@@ -110,6 +110,27 @@ class PDBC:
                 itema['list'].append(it)
         return data
 
+    @staticmethod
+    def get_user(db, uid):
+        data = {
+            'user_name': '',
+            'user_phone': '',
+            'user_area': [],
+            'user_address': ''
+        }
+        if int(uid) < 1:
+            return data
+        cursor = db.cursor()
+        sql = "SELECT name,phone,province,area,city,address FROM user_info WHERE uid = {};".format(uid)
+        cursor.execute(sql)
+        results = cursor.fetchone()
+        data = {
+            'user_name': results[0],
+            'user_phone': results[1],
+            'user_area': [results[2], results[3], results[4]],
+            'user_address': results[5]
+        }
+        return data
 
     @staticmethod
     def pick_pet(db, uid, data):
@@ -148,4 +169,14 @@ class PDBC:
             if password == item[1]:
                 return item[0]
         return -1
+
+    @staticmethod
+    def sure_user(db, uid, data):
+        cursor = db.cursor()
+        sql = "UPDATE user_info SET name='{}'," \
+              "phone='{}',province='{}',area='{}'," \
+              "city='{}',address='{}' WHERE uid = '{}';"\
+            .format(data[0], data[1], data[2], data[3], data[4], data[5], uid)
+        cursor.execute(sql)
+        return {'status': 'success'}
 
